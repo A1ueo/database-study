@@ -173,3 +173,47 @@ SELECT (TRUE OR TRUE) AND FALSE; -- 0
 
 -- 정답: ㄹ, ㄴ, ㄱ, ㅁ, ㄷ
 
+
+/*
+3.2 데이터 필터링 실습: 대학 DB
+*/
+
+-- Quiz: 대학 DB 만들기
+-- university DB 생성 및 진입
+CREATE DATABASE university;
+USE university;
+SELECT DATABASE();
+
+-- students 테이블 생성
+-- 아이디(정수형 숫자)
+-- 닉네임(문자형: 최대 50자)
+-- 수학 성적(정수형 숫자)
+-- 영어 성적(정수형 숫자)
+-- 프로그래밍 성적(정수형 숫자)
+-- 기본키 지정: id
+CREATE TABLE student (
+	id INT PRIMARY KEY,
+	nickname VARCHAR(50),
+	math INT,
+	english INT,
+	programming INT
+);
+DESC student;
+
+-- students 데이터 삽입
+INSERT INTO student
+VALUES
+	(1, 'Sparkles', 98, 96, 93),
+	(2, 'Soldier', 82, 66, 98),
+	(3, 'Lapooheart', 84, 70, 82),
+	(4, 'Slick', 87, 99, 98),
+	(5, 'Smile', 75, 73, 70),
+	(6, 'Jellyboo', 84, 82, 70),
+	(7, 'Bagel', 97, 91, 87),
+	(8, 'Queen', 99, 100, 88);
+
+-- 확인
+SELECT * FROM student;
+
+-- 필터링 연습!
+
