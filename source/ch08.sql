@@ -427,4 +427,74 @@ VALUES
 	(7, 6, 1),
 	(8, 6, 3);
 
+-- 확인
+SELECT DATABASE();
+SHOW TABLES;
+SHOW DATABASES;
 
+-- 상품 유형별 집계하기
+-- 상품 테이블에서 상품 유형별 상품의 개수, 최고 가격, 최저 가격을 구하려면?
+SELECT product_type AS '상품 유형', COUNT(*) AS '상품 개수', 
+    MAX(price) AS '최고 가격', MIN(price) AS '최저 가격'
+FROM products
+GROUP BY product_type;
+
+-- 사용자 주문 총액 필터링하기
+-- 사용자별 주문 총액을 구하고, 그 총액이 30,000원 이상인 주문자는?
+SELECT nickname, SUM(amount) -- 6) 특정 컬럼을 조회
+FROM users u -- 1) 사용자 테이블에
+JOIN orders o ON u.id = o.user_id -- 2) 주문 테이블을 붙이고
+JOIN payments p ON o.id = p.order_id -- 3) 결제 테이블도 붙이고
+GROUP BY nickname -- 4) 사용자별 그룹화를 진행하여
+HAVING SUM(amount) >= 30000; -- 5) 그룹 필터링을 하고
+
+-- 가장 많이 팔린 상품 TOP 3
+-- 상품별 판매 수량을 집계했을 때, 가장 많이 팔린 상품 TOP 3의 상품명과 판매 수량은?
+SELECT name AS '상품명', SUM(count) AS '판매 수량' -- 6)
+FROM order_details od -- 1)
+JOIN orders o ON od.order_id = o.id -- 2)
+JOIN products p ON od.product_id = p.id -- 3)
+WHERE NOT status = '장바구니' -- 4)
+GROUP BY name -- 5)
+ORDER BY SUM(count) DESC, name -- 7)
+LIMIT 3; -- 8)
+-- 경계에서 정렬 조건 외의 순서는 보장되지 않음
+
+-- Quiz: 실행 순서를 번호로 달아보기
+
+-- Quiz
+-- 3. market DB에서 배송 완료된 상품별로 누적 매출 상위 3개 상품 정보를 조회하고자 한다. 다음 쿼리의 빈칸을 채워 완성하시오.
+
+-- ------------------------------
+-- 상품명              | 누적 매출
+-- ------------------------------
+-- 무항생제 특란 20구   | 28800
+-- 수제 크림 치즈 200g  | 18000
+-- 샐러드 키트 6봉      | 17800
+
+SELECT 
+	name AS '상품명',
+	SUM(① __________) AS '누적 매출'
+FROM products
+JOIN order_details ON products.id = order_details.product_id
+JOIN orders ON order_details.order_id = orders.id
+			AND status = '배송 완료'
+GROUP BY name
+ORDER BY SUM(② __________) DESC
+LIMIT 3;
+
+-- 정답: price * count
+-- 상품 가격 기준 이론상 매출액: 실제 결제와 무관하며, 할인/부분결제/결제 누락 등을 반영하지 않음
+SELECT 
+	name AS '상품명',
+	SUM(price * count) AS '누적 매출'
+FROM products
+JOIN order_details ON products.id = order_details.product_id
+JOIN orders ON order_details.order_id = orders.id
+			AND status = '배송 완료'
+GROUP BY name
+ORDER BY SUM(price * count) DESC
+LIMIT 3;
+
+-- 추가 실습 코드
+-- 실제 결제 금액 기반
