@@ -129,3 +129,45 @@ SELECT
   amount AS '결제 금액',
   amount - (SELECT AVG(amount), '123' FROM payments) AS '평균 결제 금액과의 차이'
 FROM payments;
+
+
+-- 2. FROM 절에서의 서브쿼리
+-- N * M 반환하는 행과 컬럼의 개수에 제한이 없음
+-- 단, 서브쿼리에 별칭 지정 필수
+
+-- 1회 주문 시 평균 상품 개수는? (장바구니 상품 포함)
+-- 주문별(order_id)로 그룹화 -> count 집계: SUM() -> 재집계: AVG()
+-- 일단 먼저 주문 당 상품 개수 집계 구하기
+SELECT order_id, SUM(count) AS total_count
+FROM order_details
+GROUP BY order_id;
+
+SELECT AVG(total_count) AS '1회 주문 시 평균 상품 개수'
+FROM (
+  -- 서브쿼리
+  SELECT order_id, SUM(count) AS total_count -- 집계 함수 결과에 별칭 필수(컬럼명이 아니라 계산된 값을 반환하기 때문에)
+  FROM order_details
+  GROUP BY order_id
+) AS sub; -- 별칭 필수(AS는 생략 가능)
+
+
+-- 3. JOIN 절에서의 서브쿼리
+-- N * M 반환하는 행과 컬럼의 개수에 제한이 없음
+-- 단, 서브쿼리에 별칭 지정 필수
+
+-- 상품별 주문 개수를 '배송 완료'와 '장바구니'에 상관없이 상품명과 주문 개수를 조회한다면?
+-- 메인쿼리: 상품별 주문 개수 집계
+SELECT name AS '상품명', total_count AS '주문 개수'
+FROM products p
+JOIN (
+  -- 서브쿼리: 상품 아이디별 주문 개수 집계
+  SELECT product_id, SUM(count) AS total_count
+  FROM order_details
+  GROUP BY product_id -- 개별 실행
+) od ON p.id = od.product_id;
+
+-- (참고) 다른 방법: 일단 붙여놓고 그룹화 및 집계
+SELECT name AS '상품명', SUM(count) AS '주문 개수'
+FROM order_details od
+JOIN products p ON od.product_id = p.id
+GROUP BY name;
