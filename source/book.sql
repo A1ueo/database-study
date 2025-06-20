@@ -1,0 +1,13 @@
+CREATE DATABASE library_project;
+
+SELECT DATABASE();
+
+CREATE TABLE book (
+  id INTEGER AUTO_INCREMENT,
+  isbn CHAR(13),
+  type VARCHAR(20),
+  price INTEGER,
+  PRIMARY KEY (id)
+);
+
+SELECT * FROM book;
