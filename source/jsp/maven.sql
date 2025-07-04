@@ -43,6 +43,6 @@ SELECT board_no ,board_title ,board_content ,board_writer
 
 
 SELECT DISTINCT member_no, member_id
-FROM member
+FROM `member`
 JOIN board
 WHERE	member_no = board_writer
