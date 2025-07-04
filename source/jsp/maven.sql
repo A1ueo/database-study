@@ -42,7 +42,7 @@ SELECT board_no ,board_title ,board_content ,board_writer
 		FROM board;
 
 
-SELECT *
-		FROM member AS m
-		JOIN board AS b
-    WHERE	m.member_no = b.board_writer
+SELECT DISTINCT member_no, member_id
+FROM member
+JOIN board
+WHERE	member_no = board_writer
